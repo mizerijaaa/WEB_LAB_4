@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <title>Songs Homepage - Welcome to My Music Store</title>
+    <style type="text/css">
+        body {
+            width: 800px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Welcome to My Music Store</h1>
+    <h2 th:if="${hasError}" style="color: red">
+        <th:block th:text="${error}"></th:block>
+    </h2>
+</header>
+
+
+<section>
+    <div>
+        <th:block sec:authorize="isAuthenticated()">
+            <form th:action="@{/logout}" th:method="POST">
+                <button type="submit">Logout</button>
+            </form>
+        </th:block>
+
+        <th:block sec:authorize="isAnonymous()">
+            <form th:action="@{/login}" th:method="GET">
+                <button type="submit">Login</button>
+            </form>
+        </th:block>
+    </div>
+</section>
+
+
+<main>
+    <h2>Choose a song:</h2>
+    <form th:method="POST" th:action="@{/artist}">
+        <div th:each="song:${songs}">
+            <input type="radio" th:value="${song.getTrackId()}" name="trackId">
+            <th:block th:text="${song.getTitle() + ' ' + song.getGenre() + ' ' + song.getReleaseYear()}"></th:block>
+            <th:block th:text="${song.getAlbum().getName()}"></th:block>
+
+            <a th:href="@{'/songs/edit-form/{id}' (id=${song.getId()})}" sec:authorize="hasRole('ROLE_ADMIN')">Update Song</a>
+            <a th:href="@{'/songs/delete/{id}' (id=${song.getId()})}" sec:authorize="hasRole('ROEL_ADMIN')">Delete Song</a>
+        </div>
+        <input type='submit' value='Submit'>
+    </form>
+    <a href="/songs/add-form" sec:authorize="hasRole('ROLE_ADMIN')">Add a new song</a>
+</main>
+</body>
+</html>
